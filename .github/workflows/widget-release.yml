@@ -25,6 +25,7 @@ jobs:
     uses: jquantum-helio-qa/dagly-helio-platform-qa-20260926/.github/workflows/catalog-build.yml@dc55171d5811f60bd7c4c181b427d4cb3d2fbdc6
     with:
       helio_execution_id: ${{ inputs.helio_execution_id || '' }}
+      helio_target_environment: ${{ inputs.helio_target_environment || '' }}
       build_runner: '["self-hosted","dagly-live-widget"]'
       image_repository: localhost:5001/dagly-widget-qa-20260926
       build_adapter: cicd/helio-build.sh
@@ -39,6 +40,7 @@ jobs:
     uses: jquantum-helio-qa/dagly-helio-platform-qa-20260926/.github/workflows/catalog-deploy.yml@dc55171d5811f60bd7c4c181b427d4cb3d2fbdc6
     with:
       helio_execution_id: ${{ inputs.helio_execution_id || '' }}
+      helio_target_environment: ${{ inputs.helio_target_environment || '' }}
       deploy_adapter: cicd/helio-deploy.sh
       deploy_settings_keys: '["AWS_PROFILE","DEPLOY_ENV","DEPLOY_REGION","GO_PIPELINE_NAME","INVENTORY_GROUP","INVENTORY_SCRIPT","PLAYBOOK"]'
       secret_names: '[]'

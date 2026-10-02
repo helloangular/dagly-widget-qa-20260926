@@ -36,7 +36,20 @@ jobs:
               const ref = await api('POST', base + '/git/refs', {ref: 'refs/tags/helio/catalog/target-locks/spike-' + run + '-commit', sha: tag.sha});
               return {tag: tag.sha, ref: ref.ref};
             });
+            // C: protected namespace (ruleset update/deletion rules apply): commit tag and blob tag under plans/
+            await attempt('plans_commit_tag_ref', async () => {
+              const tag = await api('POST', base + '/git/tags', {tag: 'helio/catalog/plans/spike-' + run + '-commit', message: 'D8 spike plans control', object: process.env.GITHUB_SHA, type: 'commit'});
+              const ref = await api('POST', base + '/git/refs', {ref: 'refs/tags/helio/catalog/plans/spike-' + run + '-commit', sha: tag.sha});
+              return {tag: tag.sha, ref: ref.ref};
+            });
+            await attempt('plans_blob_tag_ref', async () => {
+              const blob = await api('POST', base + '/git/blobs', {content: body, encoding: 'utf-8'});
+              const tag = await api('POST', base + '/git/tags', {tag: 'helio/catalog/plans/spike-' + run + '-blob', message: 'D8 spike plans blob', object: blob.sha, type: 'blob'});
+              const ref = await api('POST', base + '/git/refs', {ref: 'refs/tags/helio/catalog/plans/spike-' + run + '-blob', sha: tag.sha});
+              return {tag: tag.sha, ref: ref.ref};
+            });
             // cleanup (target-locks are deletable by the ruleset)
             for (const kind of ['blob', 'commit']) await attempt('delete_' + kind, () => api('DELETE', base + '/git/refs/tags/helio/catalog/target-locks/spike-' + run + '-' + kind));
             core.info('D8_SPIKE_RESULT ' + JSON.stringify(out));
+
 

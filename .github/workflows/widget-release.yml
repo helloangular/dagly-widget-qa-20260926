@@ -22,7 +22,7 @@ permissions:
 jobs:
   artifact:
     name: Artifact
-    uses: jquantum-helio-qa/dagly-helio-platform-qa-20260926/.github/workflows/catalog-build.yml@dc55171d5811f60bd7c4c181b427d4cb3d2fbdc6
+    uses: jquantum-helio-qa/dagly-helio-platform-qa-20260926/.github/workflows/catalog-build.yml@461be087117f537a6e373ac5383bd773551b5087
     with:
       helio_execution_id: ${{ inputs.helio_execution_id || '' }}
       helio_target_environment: ${{ inputs.helio_target_environment || '' }}
@@ -37,7 +37,7 @@ jobs:
     name: Deploy
     needs:
     - artifact
-    uses: jquantum-helio-qa/dagly-helio-platform-qa-20260926/.github/workflows/catalog-deploy.yml@dc55171d5811f60bd7c4c181b427d4cb3d2fbdc6
+    uses: jquantum-helio-qa/dagly-helio-platform-qa-20260926/.github/workflows/catalog-deploy.yml@461be087117f537a6e373ac5383bd773551b5087
     with:
       helio_execution_id: ${{ inputs.helio_execution_id || '' }}
       helio_target_environment: ${{ inputs.helio_target_environment || '' }}

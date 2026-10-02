@@ -45,3 +45,15 @@ jobs:
       deploy_settings_keys: '["AWS_PROFILE","DEPLOY_ENV","DEPLOY_REGION","GO_PIPELINE_NAME","INVENTORY_GROUP","INVENTORY_SCRIPT","PLAYBOOK"]'
       secret_names: '[]'
     secrets: inherit
+  release-notes:
+    name: Release notes
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    needs:
+    - deploy
+    runs-on:
+    - self-hosted
+    - dagly-live-widget
+    steps:
+    - name: Publish release notes
+      shell: bash
+      run: echo "release notes for ${GITHUB_SHA}"

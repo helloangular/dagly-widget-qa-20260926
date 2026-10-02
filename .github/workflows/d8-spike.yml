@@ -40,3 +40,5 @@ jobs:
             for (const kind of ['blob', 'commit']) await attempt('delete_' + kind, () => api('DELETE', base + '/git/refs/tags/helio/catalog/target-locks/spike-' + run + '-' + kind));
             core.info('D8_SPIKE_RESULT ' + JSON.stringify(out));
 
+
+# D8 spike 5: dispatched on a tag whose workflow file differs from the default branch copy

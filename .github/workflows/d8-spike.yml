@@ -1,0 +1,40 @@
+name: d8-spike
+on:
+  push:
+    branches: [d8-spike]
+permissions:
+  contents: write
+jobs:
+  spike:
+    runs-on: [self-hosted, dagly-live-widget]
+    steps:
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          retries: 0
+          script: |
+            const base = '/repos/' + process.env.GITHUB_REPOSITORY;
+            const run = process.env.GITHUB_RUN_ID;
+            const api = async (m, u, b) => (await github.request(m + ' ' + u, {...b})).data;
+            const out = {};
+            const attempt = async (label, f) => { try { out[label] = {ok: true, ...(await f() || {})}; } catch (e) { out[label] = {ok: false, status: e.status, message: String(e.message).slice(0, 200)}; } };
+            const body = JSON.stringify({schema: 'helio_catalog_artifact_v2', spike: run, note: 'D8 permission spike'});
+            // A: blob -> annotated tag -> ref (deletable target-locks namespace so the spike can clean up)
+            await attempt('blob_tag_ref', async () => {
+              const blob = await api('POST', base + '/git/blobs', {content: body, encoding: 'utf-8'});
+              const tag = await api('POST', base + '/git/tags', {tag: 'helio/catalog/target-locks/spike-' + run + '-blob', message: 'D8 spike', object: blob.sha, type: 'blob'});
+              const ref = await api('POST', base + '/git/refs', {ref: 'refs/tags/helio/catalog/target-locks/spike-' + run + '-blob', sha: tag.sha});
+              const back = await api('GET', base + '/git/ref/tags/helio/catalog/target-locks/spike-' + run + '-blob');
+              const tagObj = await api('GET', base + '/git/tags/' + back.object.sha);
+              const blobObj = await api('GET', base + '/git/blobs/' + tagObj.object.sha);
+              const content = Buffer.from(blobObj.content, 'base64').toString('utf8');
+              return {blob: blob.sha, tag: tag.sha, ref: ref.ref, tag_object_type: tagObj.object.type, roundtrip: content === body};
+            });
+            // B: control — annotated tag at the commit (the current record format) -> ref
+            await attempt('commit_tag_ref', async () => {
+              const tag = await api('POST', base + '/git/tags', {tag: 'helio/catalog/target-locks/spike-' + run + '-commit', message: 'D8 spike control', object: process.env.GITHUB_SHA, type: 'commit'});
+              const ref = await api('POST', base + '/git/refs', {ref: 'refs/tags/helio/catalog/target-locks/spike-' + run + '-commit', sha: tag.sha});
+              return {tag: tag.sha, ref: ref.ref};
+            });
+            // cleanup (target-locks are deletable by the ruleset)
+            for (const kind of ['blob', 'commit']) await attempt('delete_' + kind, () => api('DELETE', base + '/git/refs/tags/helio/catalog/target-locks/spike-' + run + '-' + kind));
+            core.info('D8_SPIKE_RESULT ' + JSON.stringify(out));

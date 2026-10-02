@@ -45,3 +45,5 @@ jobs:
       deploy_settings_keys: '["AWS_PROFILE","DEPLOY_ENV","DEPLOY_REGION","GO_PIPELINE_NAME","INVENTORY_GROUP","INVENTORY_SCRIPT","PLAYBOOK"]'
       secret_names: '[]'
     secrets: inherit
+
+# D8 acceptance: workflow-file change after w18 (makes the w18 commit "behind master with a different workflow file")

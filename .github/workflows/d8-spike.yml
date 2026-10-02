@@ -2,6 +2,7 @@ name: d8-spike
 on:
   push:
     branches: [d8-spike]
+  workflow_dispatch: {}
 permissions:
   contents: write
 jobs:
@@ -38,3 +39,4 @@ jobs:
             // cleanup (target-locks are deletable by the ruleset)
             for (const kind of ['blob', 'commit']) await attempt('delete_' + kind, () => api('DELETE', base + '/git/refs/tags/helio/catalog/target-locks/spike-' + run + '-' + kind));
             core.info('D8_SPIKE_RESULT ' + JSON.stringify(out));
+

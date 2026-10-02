@@ -19,7 +19,6 @@ run-name: ${{ inputs.helio_execution_id }}
 permissions:
   contents: write
   packages: write
-  workflows: write
 jobs:
   artifact:
     name: Artifact

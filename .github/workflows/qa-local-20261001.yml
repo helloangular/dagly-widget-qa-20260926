@@ -36,7 +36,7 @@
     "deployments": "write"
   },
   "concurrency": {
-    "group": "qa-local-20261001-release",
+    "group": "qa-local-20261001-${{ inputs.helio_execution_id || github.run_id }}",
     "cancel-in-progress": false
   },
   "jobs": {
